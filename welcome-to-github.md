@@ -1,11 +1,11 @@
-# Baang-Cleaning-Services
-## Web Programming Project
+# Quick Welcome to GitHub
+## Software Engineering Class - Group 5 Project
 
 Hey guys - just throwing this together. Welcome to Github! I recognize this is most likely new to you - my goal is to provide us with an collaborative environment where we can make edits the most efficient of ways, as well as provide some insight of a popular tool used out in the software world. My goal is to NOT overwhelm anyone - so please do not hesitate to tell me if its just too much.
 
-Github provides us with the means of working on the documents from within the Baang-Cleaning-Services repository (AKA "Repo") where I have gone ahead and added the files that Emma was kind enough to get us started with. 
+Github provides us with the means of working on the documents from within the Squad-Spot repository (AKA "Repo").
 
-The advantage of tool like Github is that it is a centralized repo where theoretically, we could all work on the same document at the same time by creating whats called a "pull" request. To start, what you see on the inital screen, or "Code" tab is referred to as our "Main" branch. This is our master/primary branch or our live code that we would publish to our website. We can all work (on our own time) on the same files by using whats referred to as local branches(or HEAD), with the intention of merging/updating our master/main branch. 
+The advantage of tool like Github is that it is a centralized repo where theoretically, we could all work on the same document at the same time by creating whats called a "pull" request. To start, what you see on the inital screen, or "Code" tab is referred to as our "Main" branch. When you see main, think of this as "prod" or what our users should see when launching the app. This is our master/primary branch or our live code that we would publish to our website. We can all work (on our own time) on the same files by using whats referred to as local branches(or HEAD), with the intention of merging/updating our master/main branch. 
 
 # Pause - breathe. A lot of terms. Please ask any and all questions as I rushed to put this together :) *
 
@@ -41,8 +41,6 @@ Lets jump into an example. I am going to make an update to one of the files (Nee
 
 ## Now Pause and bear with me. I promise we are nearing the end of this "light" reading.
 
-Of course I want us to complete the project in a timely manner and be done with it, but this is something new to all of you that I am teaching and I feel I would be doing you a disservice if I do not explain the big picture of what we have done for learning purposes. Were almost there though - promise.
-
 Lets recap.
 
 1. I made my own branch (that can be used for future changes on all files, not just this specific scenario).
@@ -66,11 +64,12 @@ Thanks for making it this far - again, I hope to show a new way to you guys for 
 
 ## Links
 
-[TLDR Steps Version](https://github.com/realatc/Baang-Cleaning-Services/blob/main/Process%20Files/Tldr-Edit-Pull-Merge-Steps.md)
+[TLDR Steps Version](https://github.com/realatc/Squad-Spot/blob/main/Process%20Files/Tldr-Edit-Pull-Merge-Steps.md)
 
 #### Please excuse any misspellings or poor grammar used in this write up.
 #### Worth mentioning there are a number of ways tools like Github and Gitlab are used in development work.
 #### ex: control all of this within your CLI/Terminal vs through the GUI/website steps above
+#### Recycled from another class/project, so if some of the sentences are confusing, or maybe indicate something random, its likely due to that.
 
 
 
