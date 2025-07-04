@@ -15,3 +15,5 @@ It is now time for your next deliverable which will be your team projects. You h
 * [] Use Assignments 1, 2a and 2b to outline core features of app to be developed.
 * [x] Provide initial Github reading material to team for review.
 * [x] Create Github webhook to team channel in Discord.
+
+Pending response from team members on next steps.
