@@ -1,0 +1,32 @@
+/* Ref: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_CSS_custom_properties */
+
+/* CSS Variables for theming */
+:root {
+    /* Colors */
+    --primary-color: #007AFF;
+    --secondary-color: #5856D6;
+    --success-color: #34C759;
+    --warning-color: #FF9500;
+    --error-color: #FF3B30;
+    
+    /* Background Colors */
+    --background-color: #F2F2F7;
+    --surface-color: #FFFFFF;
+    
+    /* Text Colors */
+    --text-primary: #000000;
+    --text-secondary: #8E8E93;
+    
+    /* Border Colors */
+    --border-color: #C6C6C8;
+
+    }
+
+/* Dark mode variables */
+[data-theme="dark"] {
+    --background-color: #000000;
+    --surface-color: #1C1C1E;
+    --text-primary: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --border-color: #38383A;
+} 
