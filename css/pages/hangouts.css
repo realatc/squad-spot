@@ -1,0 +1,23 @@
+/* Hangouts Page */
+.hangouts-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hangouts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.hangouts-header h2 {
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+}
+
+.hangouts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+} 

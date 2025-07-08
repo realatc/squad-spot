@@ -1,0 +1,23 @@
+/* Squad Page */
+.squads-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.squads-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.squads-header h2 {
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+}
+
+.squads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+} 
