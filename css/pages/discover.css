@@ -1,0 +1,17 @@
+/* Discover Page */
+.discover-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.discover-container h2 {
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-lg);
+}
+
+.discover-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+} 

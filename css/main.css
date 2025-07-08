@@ -6,3 +6,9 @@ Will need to update as new files are added. This will include layouts, component
 
  /* Base Styles */
 @import url('./base/variables.css');
+
+/* Pages */
+@import url('./pages/squads.css');
+@import url('./pages/hangouts.css');
+@import url('./pages/discover.css');
+@import url('./pages/activity.css');
