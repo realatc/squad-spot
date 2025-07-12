@@ -1,3 +1,5 @@
+/* REF: https://css-tricks.com/designing-a-product-page-layout-with-flexbox/ */
+
 /* Squad Page */
 .squads-container {
     max-width: 1200px;
@@ -20,4 +22,154 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-lg);
+}
+
+/* Squad Cards */
+.squad-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.squad-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.squad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.squad-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.member-count {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    background: var(--background-color);
+    padding: 4px 8px;
+    border-radius: var(--border-radius);
+}
+
+.member-count-badge {
+    display: inline-block;
+    background: #2196f3; /* Material blue, visually appealing */
+    color: #fff;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-left: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    vertical-align: middle;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    border-radius: var(--border-radius-lg);
+    font-weight: 600;
+    padding: 8px 18px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.squad-header-row {
+    margin-bottom: var(--spacing-md);
+}
+
+.squad-members {
+    margin-top: var(--spacing-md);
+}
+
+.squad-members {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.member-more {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+}
+
+.squad-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-xxl);
+    color: var(--text-secondary);
+}
+
+.empty-state svg {
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.empty-state p {
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .squads-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: stretch;
+    }
+    
+    .squads-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .squad-actions {
+        flex-direction: column;
+    }
 } 

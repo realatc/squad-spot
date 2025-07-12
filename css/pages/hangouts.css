@@ -1,6 +1,8 @@
+/* REF: https://css-tricks.com/designing-a-product-page-layout-with-flexbox/ */
+
 /* Hangouts Page */
 .hangouts-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -19,5 +21,116 @@
 .hangouts-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+}
+
+/* Hangout Cards */
+.hangout-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.hangout-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.hangout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.hangout-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.hangout-status {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: var(--border-radius);
+    text-transform: capitalize;
+}
+
+.hangout-status.voting {
+    background: var(--warning-color);
+    color: white;
+}
+
+.hangout-status.confirmed {
+    background: var(--success-color);
+    color: white;
+}
+
+.hangout-status.completed {
+    background: var(--text-secondary);
+    color: white;
+}
+
+.hangout-details {
+    margin-bottom: var(--spacing-md);
+}
+
+.hangout-details p {
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+}
+
+.hangout-venues {
+    margin-bottom: var(--spacing-lg);
+}
+
+.hangout-venues h4 {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.venue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing-xs);
+}
+
+.venue-votes {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.hangout-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hangouts-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: stretch;
+    }
+    
+    .hangout-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .hangout-actions {
+        flex-direction: column;
+    }
 } 

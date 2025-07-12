@@ -1,17 +1,192 @@
-/* Discover Page */
+/* REF: https://css-tricks.com/designing-a-product-page-layout-with-flexbox/ */
+
+/* Discover Page Configuration */
 .discover-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-.discover-container h2 {
-    font-size: var(--font-size-xxl);
-    font-weight: 700;
+.discover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: var(--spacing-lg);
 }
 
-.discover-content {
+.discover-header h2 {
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+}
+
+/* Search Bar Configuration */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-sm);
+    box-shadow: var(--shadow);
+    max-width: 400px;
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-md);
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.search-bar input::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-fast);
+}
+
+.search-btn:hover {
+    background: var(--background-color);
+}
+
+/* Venue Filters Configuration */
+.venue-filters {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.filter-btn:hover {
+    background: var(--background-color);
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.venues-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--spacing-lg);
+}
+
+.venue-card {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.venue-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.venue-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.venue-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.venue-card:hover .venue-image img {
+    transform: scale(1.05);
+}
+
+.venue-content {
+    padding: var(--spacing-lg);
+}
+
+.venue-content h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.venue-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.venue-rating,
+.venue-price,
+.venue-type {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    background: var(--background-color);
+    padding: 2px 8px;
+    border-radius: var(--border-radius);
+    text-transform: capitalize;
+}
+
+.venue-description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-sm);
+}
+
+.venue-location {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.venue-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .discover-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: stretch;
+    }
+    
+    .search-bar {
+        max-width: none;
+    }
+    
+    .venues-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .venue-actions {
+        flex-direction: column;
+    }
 } 

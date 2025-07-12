@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>document.documentElement.setAttribute('data-theme', 'dark');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squad Spot</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">Squad Spot</h1>
+        <div class="profile-menu">
+            <button class="profile-button" id="profileButton">
+                <svg class="profile-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-item">
+                    <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    Profile
+                </div>
+                <div class="profile-item">
+                    <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                    Settings
+                </div>
+                <div class="profile-item">
+                    <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17,7l-1.41,1.41L18.17,11H8v2h10.17l-2.58,2.58L17,17l5-5L17,7z M4,5h8V3H4C2.9,3,2,3.9,2,5v14c0,1.1,0.9,2,2,2h8v-2H4V5z"/>
+                    </svg>
+                    Logout
+                </div>
+                <div class="profile-item" id="resetDemoDataItem">
+                    <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.3-.42 2.5-1.13 3.47l1.46 1.46C19.07 15.36 20 13.76 20 12c0-4.42-3.58-8-8-8zm-6.41.59L4.59 6C3.93 7.36 3 8.96 3 10.72c0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-1.3.42-2.5 1.13-3.47z"/>
+                    </svg>
+                    Reset Demo Data
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Squads Page -->
+        <section id="squads-page" class="page active">
+            <div class="squads-container">
+                <div class="squads-header">
+                    <h2>My Squads</h2>
+                </div>
+                <div class="squads-grid" id="squadsGrid">
+                    <!-- Squads will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Hangouts Page -->
+        <section id="hangouts-page" class="page">
+            <div class="hangouts-container">
+                <div class="hangouts-header">
+                    <h2>Active Hangouts</h2>
+                    <button class="btn btn-primary" id="createHangoutBtn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Plan Hangout
+                    </button>
+                </div>
+                <div class="hangouts-list" id="hangoutsList">
+                    <!-- Hangouts will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Discover Page -->
+        <section id="discover-page" class="page">
+            <div class="discover-container">
+                <div class="discover-header">
+                    <h2>Discover Places</h2>
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search venues..." id="searchInput">
+                        <button class="search-btn">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="venue-filters">
+                    <button class="filter-btn active" data-type="all">All</button>
+                    <button class="filter-btn" data-type="food">Food</button>
+                    <button class="filter-btn" data-type="entertainment">Entertainment</button>
+                    <button class="filter-btn" data-type="outdoors">Outdoors</button>
+                </div>
+                <div class="venues-grid" id="venuesGrid">
+                    <!-- Venues will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Page -->
+        <section id="activity-page" class="page">
+            <div class="activity-container">
+                <div class="activity-header">
+                    <h2>Recent Activity</h2>
+                </div>
+                <div class="activity-feed" id="activityFeed">
+                    <!-- Activity items will be populated here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating New Squad Button -->
+    <button id="floatingNewSquadBtn" aria-label="New Squad" style="position:fixed;left:20px;bottom:80px;z-index:1100;width:56px;height:56px;border-radius:50%;background:#007AFF;color:#fff;border:none;box-shadow:0 4px 16px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;">
+        <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="squads">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.7 2.26A6.49 6.49 0 0 0 10.88 8H8.5c-.8 0-1.54.37-2.01 1L4.96 14.37A1.5 1.5 0 0 0 6.5 16H9v6h2v-6h1v6h2v-6h4z"/>
+            </svg>
+            <span>Squads</span>
+        </button>
+        <button class="nav-btn" data-page="hangouts">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span>Hangouts</span>
+        </button>
+        <button class="nav-btn" data-page="discover">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span>Discover</span>
+        </button>
+        <button class="nav-btn" data-page="activity">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>
+            </svg>
+            <span>Activity</span>
+        </button>
+    </nav>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Modal Title</h3>
+                <button class="modal-close" id="modalClose">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-content" id="modalContent">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modules/navigation.js"></script>
+    <script src="js/modules/data.js"></script>
+    <script src="js/modules/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 

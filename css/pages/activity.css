@@ -1,13 +1,84 @@
+/* REF: https://css-tricks.com/designing-a-product-page-layout-with-flexbox/ */
+
 /* Activity Page */
 .activity-container {
     max-width: 800px;
     margin: 0 auto;
 }
 
-.activity-container h2 {
+.activity-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.activity-header h2 {
     font-size: var(--font-size-xxl);
     font-weight: 700;
-    margin-bottom: var(--spacing-lg);
+}
+
+/* Activity Feed */
+.activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    transition: transform var(--transition-fast);
+}
+
+.activity-item:hover {
+    transform: translateY(-1px);
+}
+
+.activity-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-message {
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    margin: 0 0 var(--spacing-xs) 0;
+    line-height: 1.4;
+}
+
+.activity-time {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .activity-item {
+        padding: var(--spacing-sm);
+    }
+    
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .activity-message {
+        font-size: var(--font-size-sm);
+    }
 }
 
 .activity-list {
