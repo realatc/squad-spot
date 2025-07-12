@@ -68,6 +68,16 @@ const SquadSpot = {
                                 SquadSpot.showSquadActionsMenu(squadId, btn);
                             });
                         });
+                        // Attach click event to squad cards to open details
+                        const squadCards = document.querySelectorAll('.squad-card');
+                        squadCards.forEach(card => {
+                            card.addEventListener('click', (e) => {
+                                // Prevent if clicking the actions button or its children
+                                if (e.target.closest('.squad-actions-btn')) return;
+                                const squadId = card.getAttribute('data-squad-id');
+                                SquadSpot.viewSquad(squadId);
+                            });
+                        });
                     }
                 }
             }
@@ -599,14 +609,30 @@ SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
     menu.innerHTML = `
         <button class="btn btn-secondary" style="width:100%;text-align:left;padding:12px 24px;border:none;background:none;" onclick="UI.hideModal();SquadSpot.viewSquad('${squadId}')">View Squad</button>
         <button class="btn btn-secondary" style="width:100%;text-align:left;padding:12px 24px;border:none;background:none;" onclick="UI.hideModal();SquadSpot.createHangout('${squadId}')">Plan Hangout</button>
+        <button class="btn btn-danger" style="width:100%;text-align:left;padding:12px 24px;border:none;background:none;color:#f44336;" onclick="SquadSpot.deleteSquadConfirm('${squadId}')">Delete Squad</button>
     `;
     document.body.appendChild(menu);
-    // Remove menu on click outside
-    const removeMenu = (e) => {
-        if (!menu.contains(e.target)) {
-            menu.remove();
-            document.removeEventListener('mousedown', removeMenu);
+    // Remove menu on click or touch outside
+    setTimeout(() => {
+        const removeMenu = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', removeMenu, true);
+                document.removeEventListener('touchstart', removeMenu, true);
+            }
+        };
+        document.addEventListener('click', removeMenu, true);
+        document.addEventListener('touchstart', removeMenu, true);
+    }, 0);
+}; 
+
+SquadSpot.deleteSquadConfirm = function(squadId) {
+    if (confirm('Are you sure you want to delete this squad? This action cannot be undone.')) {
+        DataManager.removeSquad(squadId);
+        // Refresh squads list
+        if (typeof SquadManager !== 'undefined') {
+            SquadManager.loadSquads();
         }
-    };
-    document.addEventListener('mousedown', removeMenu);
+        UI.hideModal();
+    }
 }; 
