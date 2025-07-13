@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Squad Spot - Your Group's Outing Planner</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { width: 500px; height: 500px; margin: 0 auto; }
+    #message { text-align: center; margin: 10px; font-weight: bold; color: red; }
+    #squad-container { margin-bottom: 10px; text-align: center; }
+    #search-container { margin-bottom: 20px; text-align: center; position: relative; }
+    #searchBar { margin-bottom: 10px; width: 200px; }
+    #userList { margin: 20px; font-weight: bold; }
+    #userList ul { padding: 0; list-style-type: none; }
+    #userList li { padding: 5px; }
+    #activity-suggestions { margin-top: 10px; text-align: center; position: absolute; top: 50px; left: 50%; transform: translateX(-50%); background-color: #f9f9f9; border: 1px solid #ddd; width: 200px; z-index: 100; display: none; }
+    #activity-suggestions ul { padding: 0; list-style-type: none; margin: 0; }
+    #activity-suggestions li { padding: 5px; cursor: pointer; background-color: lightgray; }
+  </style>
+</head>
+<body>
+
+<h1>Squad Spot - Plan Your Outing</h1>
+
+<!-- Basic UI for selecting a squad to join for test -->
+<div id="squad-container">
+  <h2>Join a Squad</h2>
+  <select id="squadSelect">
+    <option value="" disabled selected>Select a Squad</option>
+  </select>
+  <button id="joinSquadBtn">Join Squad</button>
+  <div id="squadMessage"></div>
+</div>
+
+<!-- Search for places based on activity -->
+<div id="search-container">
+  <input id="query" placeholder="Search for an activity (e.g., restaurant, park)" />
+  <button id="searchBtn">Search</button>
+</div>
+
+<!-- Created test Squad Members -->
+<div id="userList">
+  <h3>Squad Members</h3>
+  <ul id="squadMembers"></ul>
+</div>
+
+<!-- Map and messages -->
+<div id="message"></div>
+<div id="map"></div>
+
+<!-- Activity Suggestions -->
+<div id="activity-suggestions">
+  <ul id="suggestionsList"></ul>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Initialize map centered around a default location (Atlanta, GA)
+  let map = L.map('map').setView([33.7490, -84.3880], 12);  // Atlanta, GA
+  let markers = []; // Array to store map markers
+  let userMarker = null; // To store the user's current location marker
+  let squadMembers = []; // To store squad members
+  let selectedSquad = null; // The currently selected squad
+
+  // Predefined squads and their members (with coordinates from various locations)
+  const squads = [
+    {
+      name: 'Squad A', members: [
+        { lat: 33.7490, lng: -84.3880, name: 'Atlanta User 1' },  // Atlanta, GA
+        { lat: 33.7627, lng: -84.4221, name: 'Atlanta User 2' }   // Atlanta, GA (Midtown)
+      ]
+    },
+    {
+      name: 'Squad B', members: [
+        { lat: 33.9496, lng: -83.3779, name: 'Athens User 1' },   // Athens, GA
+        { lat: 33.9536, lng: -83.3770, name: 'Athens User 2' }    // Athens, GA (Downtown)
+      ]
+    },
+    {
+      name: 'Squad C', members: [
+        { lat: 33.7564, lng: -84.3893, name: 'Atlanta User 3' },  // Atlanta, GA (Buckhead)
+        { lat: 33.7756, lng: -84.3963, name: 'Atlanta User 4' }   // Atlanta, GA (Ponce City Market)
+      ]
+    },
+    {
+      name: 'Squad D', members: [
+        { lat: 33.5746, lng: -83.3440, name: 'Athens User 3' },   // Athens, GA (UGA Campus)
+        { lat: 33.5399, lng: -83.4263, name: 'Athens User 4' }    // Athens, GA (North Athens)
+      ]
+    },
+    {
+      name: 'Squad E', members: [
+        { lat: 33.7480, lng: -84.3882, name: 'Atlanta User 5' },  // Atlanta, GA (Downtown)
+        { lat: 34.0625, lng: -83.2477, name: 'Lawrenceville User' }  // Lawrenceville, GA
+      ]
+    }
+  ];
+
+  let userLocations = []; // Stores real and predefined user locations
+
+  // to type in input in the search bar
+  const activitiesList = [
+    "restaurant", "park", "cafe", "gym", "museum", "movie", "bar", "shopping", "hiking", "beach"
+  ];
+
+  // Use OpenStreetMap tiles for the map
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+
+  // Function to calculate centroid (center point) of multiple locations
+  function calculateCentroid(locations) {
+    let latSum = 0, lngSum = 0;
+    locations.forEach(({ lat, lng }) => {
+      latSum += lat;
+      lngSum += lng;
+    });
+    return { lat: latSum / locations.length, lng: lngSum / locations.length };
+  }
+
+  // Function to update the squad members list on the UI
+  function updateSquadList(squad) {
+    const squadListElement = document.getElementById('squadMembers');
+    squadListElement.innerHTML = ''; // Clear previous list
+
+    squad.members.forEach(user => {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${user.name} - Location: [${user.lat}, ${user.lng}]`;
+      squadListElement.appendChild(listItem);
+    });
+  }
+
+  // Function to show all squad members' markers on the map
+  function showSquadMembers(squad) {
+    markers.forEach(marker => map.removeLayer(marker)); // Clear previous markers
+    markers = [];
+
+    squad.members.forEach(user => {
+      const marker = L.marker([user.lat, user.lng]).addTo(map);
+      marker.bindPopup(`${user.name}'s Location`).openPopup();
+      markers.push(marker);
+    });
+  }
+
+  // Function to populate the dropdown with squad names
+  function populateSquadDropdown() {
+    const squadSelect = document.getElementById('squadSelect');
+    squads.forEach(squad => {
+      const option = document.createElement('option');
+      option.value = squad.name;
+      option.textContent = squad.name;
+      squadSelect.appendChild(option);
+    });
+  }
+
+  // Function to handle the join squad button click event
+  document.getElementById('joinSquadBtn').addEventListener('click', () => {
+    const selectedSquadName = document.getElementById('squadSelect').value;
+    if (!selectedSquadName) {
+      alert('Please select a squad to join.');
+      return;
+    }
+
+    // Find the selected squad
+    selectedSquad = squads.find(squad => squad.name === selectedSquadName);
+
+    // Get real user location using Geolocation API
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const userLoc = { lat: position.coords.latitude, lng: position.coords.longitude, name: 'Real User' };
+
+        selectedSquad.members.push(userLoc); // Add the real user to the squad when testing code
+        userLocations.push(userLoc); // Store the real user's location
+
+        document.getElementById('squadMessage').textContent = `You joined ${selectedSquad.name} squad! Location shared.`;
+
+        // Update the squad list and display their locations on the map
+        updateSquadList(selectedSquad);
+        showSquadMembers(selectedSquad);
+      });
+    } else {
+      alert('Geolocation is not supported by your browser.');
+    }
+  });
+
+  // Function to handle the activity search input
+  document.getElementById('query').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    const filteredActivities = activitiesList.filter(activity => activity.startsWith(query));
+
+    const suggestionsList = document.getElementById('suggestionsList');
+    suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+    if (filteredActivities.length > 0) {
+      document.getElementById('activity-suggestions').style.display = 'block';
+    } else {
+      document.getElementById('activity-suggestions').style.display = 'none';
+    }
+
+    filteredActivities.forEach(activity => {
+      const suggestionItem = document.createElement('li');
+      suggestionItem.textContent = activity;
+      suggestionItem.addEventListener('click', () => {
+        document.getElementById('query').value = activity;
+        suggestionsList.innerHTML = ''; // Clear suggestions when a suggestion is selected
+        document.getElementById('activity-suggestions').style.display = 'none'; // Hide suggestions
+      });
+      suggestionsList.appendChild(suggestionItem);
+    });
+  });
+
+  // Function to search for places based on the entered activity
+  async function searchPlaces(query, locations) {
+    const messageEl = document.getElementById('message');
+    messageEl.textContent = '';
+
+    if (!query || !locations.length) {
+      alert('Please enter a search query and provide location(s).');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, locations }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        alert('Error fetching places: ' + (err.error || response.statusText));
+        return;
+      }
+
+      const data = await response.json();
+
+      const centroid = data.centroid;
+      map.setView([centroid.lat, centroid.lng], 13);
+
+      // Clear previous markers except userMarker
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
+
+      // Ensure user's location marker is still visible
+      if (userMarker) {
+        userMarker.addTo(map);
+      }
+
+      if (!data.results || data.results.length === 0) {
+        messageEl.textContent = 'No places found within the specified area of 5 km.';
+        return;
+      }
+
+      // Display new markers for the places returned from the search
+      data.results.forEach(place => {
+        const lat = place.position.lat;
+        const lon = place.position.lon;
+
+        const marker = L.marker([lat, lon]).addTo(map);
+
+        // Directions links to Google Maps and Apple Maps
+        const googleMapsLink = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+        const appleMapsLink = `https://maps.apple.com/?daddr=${lat},${lon}`;
+
+        // Bind popup with name, address, and direction links
+        marker.bindPopup(`
+          <strong>${place.poi.name}</strong><br/>
+          ${place.address.freeformAddress}<br/>
+          <a href="${googleMapsLink}" target="_blank">Get Directions (Google Maps)</a><br/>
+          <a href="${appleMapsLink}" target="_blank">Get Directions (Apple Maps)</a>
+        `).openPopup();
+
+        markers.push(marker);
+      });
+    } catch (error) {
+      alert('Error during search: ' + error.message);
+    }
+  }
+
+  // Handle the "Search" button for places
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const query = document.getElementById('query').value;
+    searchPlaces(query, userLocations);  // Call the new searchPlaces function
+  });
+
+  // Populate squad dropdown on page load
+  window.onload = () => {
+    populateSquadDropdown();
+  };
+</script>
+
+</body>
+</html>
