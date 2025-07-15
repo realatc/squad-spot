@@ -110,6 +110,19 @@ const SquadSpot = {
                             const totalVotes = Object.keys(hangout.votes).length;
                             const squadMemberCount = squad ? squad.members.length : 0;
                             
+                            // Send notification to those who have not voted
+                            const hasUserVoted = !!hangout.votes['user1']; // will replace ['user1'] with userId
+                            const voteThreshold = Math.ceil(squadMemberCount / 2);
+                            
+                            if (!hasUserVoted && totalVotes >= voteThreshold) {
+                                showNotification(
+                                    "Reminder to vote!",
+                                    `More than half of your squad voted for "${hangout.title}". Click to vote!`,
+                                    "hangouts"
+                                );
+                                localStorage.setItem(notifKey, 'true');
+                            }
+
                             return `
                                 <div class="hangout-card card" data-hangout-id="${hangout.id}">
                                     <div class="hangout-header">
@@ -301,7 +314,7 @@ const SquadSpot = {
                 break;
         }
     },
-    
+
     // Modal handlers
     showCreateSquadModal() {
         const fields = [
@@ -473,6 +486,13 @@ const SquadSpot = {
                 squadId: hangout.squadId
             });
         }
+
+        // Poll notifications are in
+        showNotification(
+            "Poll results are in!",
+            "View chosen venue.",
+            "hangouts",
+        )
     },
     
     viewVenue(venueId) {
@@ -585,6 +605,9 @@ const SquadSpot = {
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     SquadSpot.init();
+
+    requestNotifPermission(); // Asks user for notification permission
+
     const newSquadBtn = document.getElementById('floatingNewSquadBtn');
     if (newSquadBtn) {
         newSquadBtn.addEventListener('click', () => {
@@ -592,6 +615,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// User Notification Permission
+function requestNotifPermission() {
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted');
+            }
+        });
+    }
+}
 
 SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
     // Simple actions menu (can be expanded)
@@ -636,3 +670,136 @@ SquadSpot.deleteSquadConfirm = function(squadId) {
         UI.hideModal();
     }
 }; 
+
+// Notification handler
+function showNotification(title, body, targetPage) {
+    if (Notification.permission === 'granted') {
+        const notification = new Notification(title, { 
+            body, 
+            //icon: ".png", // adding image is optional
+            vibrate: true 
+    });
+        notification.onclick = () => {
+            window.focus();
+        
+        setTimeout(() => {
+            notification.close();
+        }, 10 * 1000);
+
+            if (targetPage) {
+                const targetBtn = document.querySelector(`.nav-btn[data-page="${targetPage}"]`);
+                if (targetBtn) targetBtn.click();
+            }
+        };
+    }
+}
+/*window.NotificationManager = {
+    checkNotifications() {
+        const userID = 'user1'; // To be replaced with actual users later on
+        const hangouts = DataManager.getHangouts();
+        const squads = DataManager.getSquads();
+        const unseenSquads = squads.filter(squad => !localStorage.getItem(`seenSquad_${squad.id}`));
+
+
+
+        // Notfies user they have been added to a new squd
+        unseenSquads.forEach(squad => {
+            UI.showNotification(`You have been added to a new squad: "${squad.name}`, `info`);
+            localStorage.setItem(`seenSquad_${squad.id}`, `true`);
+        });
+
+        // Votes
+        hangouts.forEach(hangout => {
+            if (!hangout.votes[userID]) {
+                UI.showNotification(`You have not voted for "${hangout.title}"`, `warning`);
+            }
+        });
+
+        // Poll result notification
+        hangouts.forEach(hangout => {
+            if (hangout.status === 'complete' && !localStorage.getItem(`seenResults_${hangout.id}`)) {
+                UI.showNotification(`Poll results are in for "${hangout.id}`, 'success');
+                localStorage.setItem(`seenResults_${hangout.id}`, 'true');
+            }
+        });
+    }
+};*/
+
+// Create .ics
+const formatDateUTC = (date) => {
+    return date.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+};
+const hangouts = DataManager.getHangouts();
+
+function generateICS({ title, location, start}) {
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const formatDate = (date) => {
+        return date.getUTCFullYear().toString() +
+            pad(date.getUTCMonth() + 1) +
+            pad(date.getUTCDate()) + 'T' +
+            pad(date.getUTCHours()) +
+            pad(date.getUTCMinutes()) + '00Z';
+    };
+
+    const content = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Squad Spot//EN',
+        'CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        `SUMMARY:${title}`,
+        `LOCATION:${location}`,
+        `DTSTART:${formatDate(start)}`,
+        'DESCRIPTION:Planned using Squad Spot',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+
+    return new Blob([content], { type: 'text/calendar' });
+}
+
+// Download Calender Invite
+function downloadCalInvite({title, location, startTime}) {
+    const blob = generateICS({
+        title,
+        location,
+        start: new Date(startTime)
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = `${title.replace(/\s+/g, '_')}.ics`;
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Render the hangouts page
+const hangoutsList = document.getElementById('hangoutsList')
+
+hangouts.forEach(h => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+        <h3>${h.title}</h3>
+        <p>${h.location} - ${h.startTime}</p>
+        <button class="download-invite-btn" data-id="${h.id}">Download Invite</button> 
+    `;
+     hangoutsList.appendChild(div);
+});
+
+// Event listener to download invite
+document.getElementById('hangoutsList').addEventListener('click', (e) => {
+  if (e.target.classList.contains('download-invite-btn')) {
+    const hangoutId = e.target.getAttribute('data-id');
+    const hangout = hangouts.find(h => h.id.toString() === hangoutId);
+
+    if (hangout) {
+      downloadCalInvite(hangout);
+    }
+  }
+});
