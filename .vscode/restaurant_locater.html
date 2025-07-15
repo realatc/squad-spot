@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Squad Spot: Find Nearby Restaurants</title>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, button { padding: 10px; font-size: 1rem; margin-top: 10px; width: 100%; }
+    #results { margin-top: 20px; }
+    .restaurant { margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>🍕 Squad Spot Restaurant Finder</h1>
+  <p>Enter ZIP code and state (e.g., 30303 GA):</p>
+  <input type="text" id="locationInput" placeholder="ZIP + State">
+  <button onclick="findRestaurants()">Search Restaurants</button>
+
+  <div id="results"></div>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHdCV-vtenMQWl3qr8qxw7jam3a0zIuBY&libraries=places">
+    </script>
+
+  <script>
+    async function findRestaurants() {
+      const input = document.getElementById('locationInput').value;
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = 'Searching...';
+
+      try {
+        // Step 1: Geocode ZIP/state into lat/lng
+        const geoResp = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(input)}&key=AIzaSyBHdCV-vtenMQWl3qr8qxw7jam3a0zIuBY`);
+        const geoData = await geoResp.json();
+
+        if (!geoData.results[0]) {
+          resultsDiv.innerHTML = 'Location not found.';
+          return;
+        }
+
+        const { lat, lng } = geoData.results[0].geometry.location;
+
+        // Step 2: Initialize Places Service (invisible map required)
+        const map = new google.maps.Map(document.createElement('div'));
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+          location: { lat, lng },
+          radius: 3000, // in meters
+          type: 'restaurant'
+        };
+
+        service.nearbySearch(request, (results, status) => {
+          if (status !== google.maps.places.PlacesServiceStatus.OK || !results.length) {
+            resultsDiv.innerHTML = 'No restaurants found.';
+            return;
+          }
+
+          // Step 3: Display results
+          resultsDiv.innerHTML = '';
+          results.slice(0, 10).forEach(place => {
+            const div = document.createElement('div');
+            div.className = 'restaurant';
+            div.innerHTML = `
+              <strong>${place.name}</strong><br>
+              ${place.vicinity}<br>
+              ⭐ Rating: ${place.rating || 'N/A'}<br>
+              💵 Price Level: ${'💲'.repeat(place.price_level || 0)}
+            `;
+            resultsDiv.appendChild(div);
+          });
+        });
+
+      } catch (err) {
+        console.error(err);
+        resultsDiv.innerHTML = 'Something went wrong.';
+      }
+    }
+  </script>
+</body>
+</html>
