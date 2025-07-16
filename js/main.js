@@ -593,6 +593,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    SquadSpot.init();
+
+  // Registering Service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('js/service-worker.js')
+    .then((reg) => console.log("service Worker registered:", reg))
+    .catch((err) => console.log("service Worker registeration failed:", err));
+}
+// Switch btw Login and Sign up links 
+    const loginForm = document.querySelector("#loginForm");
+    const createAccountForm = document.querySelector("#createAccountForm");   
+    document.querySelector("#linkCreateAccount").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.add("form--hidden");
+        createAccountForm.classList.remove("form--hidden");
+    });
+
+    document.querySelector("#linkLogin").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.remove("form--hidden");
+        createAccountForm.classList.add("form--hidden");
+    });
+});
+
 SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
     // Simple actions menu (can be expanded)
     const menu = document.createElement('div');
