@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Squad Spot Voting</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+      width: 250px;
+      background-color: #f7f7f7;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    /* Legend box */
+    .legend {
+      margin-bottom: 30px;
+    }
+
+    .legend h3 {
+      margin-top: 0;
+    }
+
+    .main {
+      padding: 30px;
+      flex-grow: 1;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+    }
+
+    .emoji {
+      font-size: 24px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .votes {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #winner {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="legend">
+      <h3>🧭 Voting Legend</h3>
+      <p>🔥 = Yes</p>
+      <p>🤔 = Maybe</p>
+      <p>❌ = No</p>
+    </div>
+    <div id="winner">🏆 Current Leader: None</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h1>Vote for Your Favorite Hangout Spot! 🗳️</h1>
+    <div id="locations">
+      <!-- Cards will be injected here -->
+    </div>
+  </div>
+
+  <script src="votes_for_emojis.js"></script>
+</body>
+</html>
