@@ -684,14 +684,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    SquadSpot.init();
 
   // Registering Service worker
-    if ('serviceWorker' in navigator) { 
-        navigator.serviceWorker.register('js/service-worker.js')
-        .then((reg) => console.log("service Worker registered:", reg.scope))
-        .catch((err) => console.log("service Worker registeration failed:", err));
-    }
+   if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('js/service-worker.js')
+    .then((reg) => console.log("service Worker registered:", reg))
+    .catch((err) => console.log("service Worker registeration failed:", err));
+}
 
     // Switch btw Login and Sign up links 
     const loginForm = document.querySelector("#loginForm");
@@ -728,6 +727,8 @@ document.addEventListener("DOMContentLoaded", () => {
             'PRODID:-//Squad Spot//EN',
             'CALSCALE:GREGORIAN',
             'BEGIN:VEVENT',
+            `UID:${Date.now()}@squadspot.com` // this should work
+            `DTSTAMP:${formatDate(now)}`
             `SUMMARY:${title}`,
             `LOCATION:${location}`,
             `DTSTART:${formatDate(date)}`,
@@ -774,7 +775,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
 });
 
 SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
