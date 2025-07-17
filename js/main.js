@@ -110,19 +110,52 @@ const SquadSpot = {
                             const totalVotes = Object.keys(hangout.votes).length;
                             const squadMemberCount = squad ? squad.members.length : 0;
                             
-                            // Send notification to those who have not voted
-                            const hasUserVoted = !!hangout.votes['user1']; // will replace ['user1'] with userId
-                            const voteThreshold = Math.ceil(squadMemberCount / 2);
-                            
-                            if (!hasUserVoted && totalVotes >= voteThreshold) {
-                                showNotification(
-                                    "Reminder to vote!",
-                                    `More than half of your squad voted for "${hangout.title}". Click to vote!`,
-                                    "hangouts"
-                                );
-                                localStorage.setItem(notifKey, 'true');
-                            }
+                            // Notification for users who have not voted
+                            const userId = localStorage.getItem('userId');
+                            const notifKey = `notified_${hangout.id}_${userId}`;
 
+                            if (userId) {
+                                const hasUserVoted = !!hangout.votes[userId];
+                                const voteThreshold = Math.ceil(squadMemberCount / 2);
+
+                                if (!hasUserVoted && totalVotes >= voteThreshold && !localStorage.getItem(notifKey)) {
+                                    showNotification(
+                                        "Reminder to vote!",
+                                        `More than half of your squad voted for "${hangout.title}". Click to vote!`,
+                                        "IconImage/AppIcon-192.png",
+                                        "hangouts"
+                                    );
+                                    localStorage.setItem(notifKey, 'true');
+                                }
+                            }
+                            // Notification to users who have not voted a day before event
+                            const hangoutDate = new Date(hangout.date);
+                            const now = new Date();
+                            const oneDayMs = 24 * 60 * 60 * 1000;
+                            const timeDiffMs = hangoutDate - now;
+
+                            if (timeDiffMs <= oneDayMs && timeDiffMs > 0) {
+                                const squadMembers = DataManager.getSquadMembers(hangout.squadId);
+
+                                squadMembers.forEach(member => {
+                                    const memberId = member.id;
+                                    const hasVoted = !!hangout.votes[memberId];
+                                    const reminderKey = `dayBeforeReminder_${hangout.id}_${memberId}`;
+
+                                    if (!hasVoted && !localStorage.getItem(reminderKey)) {
+                                        if (memberId === localStorage.getItem('userId')) {
+                                            // Only show notification to the *current user*
+                                            showNotification(
+                                                "Reminder vote: Time is running out!",
+                                                `The hangout "${hangout.title}" is tomorrow and you have not voted.`,
+                                                "IconImage/AppIcon-192.png",
+                                                "hangouts"
+                                            );
+                                        }
+                                        localStorage.setItem(reminderKey, 'true');
+                                    }
+                                });
+                            }
                             return `
                                 <div class="hangout-card card" data-hangout-id="${hangout.id}">
                                     <div class="hangout-header">
@@ -467,6 +500,7 @@ const SquadSpot = {
     },
     
     castVote(hangoutId, venueId) {
+        const currentUser = localStorage.getItem('userId'); // This can be used to get the user instead of using 'user1'
         const success = DataManager.updateHangoutVote(hangoutId, 'user1', venueId);
         if (success) {
             UI.hideModal();
@@ -485,14 +519,47 @@ const SquadSpot = {
                 message: `Alex voted for ${venue.name}`,
                 squadId: hangout.squadId
             });
-        }
 
-        // Poll notifications are in
-        showNotification(
-            "Poll results are in!",
-            "View chosen venue.",
-            "hangouts",
-        )
+            // Notification voting is complete
+            // Check if all votes are in
+            const totalMembers = DataManager.getSquadMembers(hangout.squadId).length;
+            const votesCast = hangout.venues.reduce((total, venue) => total + venue.votes.length, 0);
+
+            if (votesCast >= totalMembers) {
+                // Find venue with most votes
+                const winningVenue = hangout.venues.reduce((max, venue) =>
+                    venue.votes.length > max.votes.length ? venue : max
+                );
+
+                // Display Calendar Invite
+                downloadCalInvite({
+                    title: hangout.title,
+                    location: winningVenue.name,
+                    date: new Date(hangout.date)
+                });
+
+                // Send notification in-app & PWA
+                UI.showNotification(`Poll Closed! ${winningVenue.name} was chosen.`, 'info');
+                if (Notification.permission === 'granted') {
+                    navigator.serviceWorker.getRegistration().then(reg => {
+                        if (reg) {
+                            reg.showNotification('Poll Results Are In!', {
+                                body: `${winningVenue.name} was voted as the venue.`,
+                                icon: 'IconImage/AppIcon-192.png',
+                                data: {
+                                    url: '/?page=results' // could go the the poll page 
+                                }});
+                        }});
+                }}}
+
+                // Set Reminder if event date is known
+                const eventDate = new Date(hangout.date);
+                
+                const oneDayBefore = new Date(eventDate.getTime() - 24 * 60 * 60 * 1000);
+                scheduleReminder(oneDayBefore, `Reminder: ${hangout.title} is tomorrow!`, "hangouts");
+                
+                const twoHoursBefore = new Date(eventDate.getTime() - 2 * 60 * 60 * 1000);
+                scheduleReminder(twoHoursBefore, `Reminder: ${hangout.title} starts in 2 hours!`, "hangouts");
     },
     
     viewVenue(venueId) {
@@ -616,16 +683,99 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// User Notification Permission
-function requestNotifPermission() {
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted');
+document.addEventListener("DOMContentLoaded", () => {
+    SquadSpot.init();
+
+  // Registering Service worker
+    if ('serviceWorker' in navigator) { 
+        navigator.serviceWorker.register('js/service-worker.js')
+        .then((reg) => console.log("service Worker registered:", reg.scope))
+        .catch((err) => console.log("service Worker registeration failed:", err));
+    }
+
+    // Switch btw Login and Sign up links 
+    const loginForm = document.querySelector("#loginForm");
+    const createAccountForm = document.querySelector("#createAccountForm");   
+    document.querySelector("#linkCreateAccount").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.add("form--hidden");
+        createAccountForm.classList.remove("form--hidden");
+    });
+
+    document.querySelector("#linkLogin").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.remove("form--hidden");
+        createAccountForm.classList.add("form--hidden");
+    });
+
+    // Calendar Invite
+    //const hangouts = DataManager.getHangouts();
+    const hangoutsList = document.getElementById("hangoutsList");
+
+    function generateICS({title, location, date}) {
+        const pad = (n) => String(n).padStart(2, '0');
+        const formatDate = (date) => {
+            return date.getUTCFullYear().toString() +
+                pad(date.getUTCMonth() + 1) +
+                pad(date.getUTCDate()) + 'T' +
+                pad(date.getUTCHours()) +
+                pad(date.getUTCMinutes()) + '00Z';
+        };
+        const end = new Date(date.getTime() + 60 * 60 * 1000);
+        const content = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Squad Spot//EN',
+            'CALSCALE:GREGORIAN',
+            'BEGIN:VEVENT',
+            `SUMMARY:${title}`,
+            `LOCATION:${location}`,
+            `DTSTART:${formatDate(date)}`,
+            `DTEND:${formatDate(end)}`,
+            'DESCRIPTION:Planned using Squad Spot',
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+        return new Blob([content], {type: 'text/calendar'});
+    }
+    function downloadCalInvite({ title, location, date }) {
+        const blob = generateICS({ title, location, date: new Date(date) });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title.replace(/\s+/g, '_')}.ics`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Only sends if hangoutsLists is not empty
+    if (hangoutsList && hangouts.length > 0) {
+        hangouts.forEach(h => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <h3>${h.title}</h3>
+                <p>${h.location} - ${new Date(h.date).toLocaleString()}</p>
+                <button class="download-invite-btn" data-id="${h.id}">Download Invite</button>`;
+            hangoutsList.appendChild(div);
+        });
+        hangoutsList.addEventListener("click", (e) => {
+            if (e.target.classList.contains('download-invite-btn')) {
+                const hangoutId = e.target.getAttribute('data-id');
+                const hangout = hangouts.find(h => h.id.toString() === hangoutId);
+                if (hangout) {
+                    downloadCalInvite({
+                        title: hangout.title,
+                        location: hangout.location,
+                        date: new Date(hangout.date)
+                    });
+                }
             }
         });
     }
-}
+
+});
 
 SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
     // Simple actions menu (can be expanded)
@@ -671,21 +821,30 @@ SquadSpot.deleteSquadConfirm = function(squadId) {
     }
 }; 
 
+// Reminder Function
+function scheduleReminder(date, message, page) {
+    const now = new Date();
+    const delay = date.getTime() - now.getTime();
+
+    if (delay > 0) {
+        setTimeout(() => {
+            showNotification("Event Reminder", message, page);
+        }, delay);
+    }
+}
+
 // Notification handler
 function showNotification(title, body, targetPage) {
     if (Notification.permission === 'granted') {
         const notification = new Notification(title, { 
             body, 
-            //icon: ".png", // adding image is optional
+            icon: "IconImage/AppIcon-192.png", // adding image is optional we can remove this
+            data: {targetPage},
             vibrate: true 
-    });
+        });
         notification.onclick = () => {
             window.focus();
-        
-        setTimeout(() => {
-            notification.close();
-        }, 10 * 1000);
-
+            const targetPage = notification.data?.targetPage;
             if (targetPage) {
                 const targetBtn = document.querySelector(`.nav-btn[data-page="${targetPage}"]`);
                 if (targetBtn) targetBtn.click();
@@ -693,113 +852,13 @@ function showNotification(title, body, targetPage) {
         };
     }
 }
-/*window.NotificationManager = {
-    checkNotifications() {
-        const userID = 'user1'; // To be replaced with actual users later on
-        const hangouts = DataManager.getHangouts();
-        const squads = DataManager.getSquads();
-        const unseenSquads = squads.filter(squad => !localStorage.getItem(`seenSquad_${squad.id}`));
 
-
-
-        // Notfies user they have been added to a new squd
-        unseenSquads.forEach(squad => {
-            UI.showNotification(`You have been added to a new squad: "${squad.name}`, `info`);
-            localStorage.setItem(`seenSquad_${squad.id}`, `true`);
-        });
-
-        // Votes
-        hangouts.forEach(hangout => {
-            if (!hangout.votes[userID]) {
-                UI.showNotification(`You have not voted for "${hangout.title}"`, `warning`);
+// Notification permission
+function requestNotifPermission() {
+    if ('Notification' in window) { 
+        Notification.requestPermission().then(permission => {
+            console.log("Notification permission status:", permission);
             }
-        });
-
-        // Poll result notification
-        hangouts.forEach(hangout => {
-            if (hangout.status === 'complete' && !localStorage.getItem(`seenResults_${hangout.id}`)) {
-                UI.showNotification(`Poll results are in for "${hangout.id}`, 'success');
-                localStorage.setItem(`seenResults_${hangout.id}`, 'true');
-            }
-        });
+        );
     }
-};*/
-
-// Create .ics
-const formatDateUTC = (date) => {
-    return date.toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
-};
-const hangouts = DataManager.getHangouts();
-
-function generateICS({ title, location, start}) {
-    const pad = (n) => String(n).padStart(2, '0');
-
-    const formatDate = (date) => {
-        return date.getUTCFullYear().toString() +
-            pad(date.getUTCMonth() + 1) +
-            pad(date.getUTCDate()) + 'T' +
-            pad(date.getUTCHours()) +
-            pad(date.getUTCMinutes()) + '00Z';
-    };
-
-    const content = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Squad Spot//EN',
-        'CALSCALE:GREGORIAN',
-        'BEGIN:VEVENT',
-        `SUMMARY:${title}`,
-        `LOCATION:${location}`,
-        `DTSTART:${formatDate(start)}`,
-        'DESCRIPTION:Planned using Squad Spot',
-        'END:VEVENT',
-        'END:VCALENDAR'
-    ].join('\r\n');
-
-    return new Blob([content], { type: 'text/calendar' });
 }
-
-// Download Calender Invite
-function downloadCalInvite({title, location, startTime}) {
-    const blob = generateICS({
-        title,
-        location,
-        start: new Date(startTime)
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-
-    a.href = url;
-    a.download = `${title.replace(/\s+/g, '_')}.ics`;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Render the hangouts page
-const hangoutsList = document.getElementById('hangoutsList')
-
-hangouts.forEach(h => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-        <h3>${h.title}</h3>
-        <p>${h.location} - ${h.startTime}</p>
-        <button class="download-invite-btn" data-id="${h.id}">Download Invite</button> 
-    `;
-     hangoutsList.appendChild(div);
-});
-
-// Event listener to download invite
-document.getElementById('hangoutsList').addEventListener('click', (e) => {
-  if (e.target.classList.contains('download-invite-btn')) {
-    const hangoutId = e.target.getAttribute('data-id');
-    const hangout = hangouts.find(h => h.id.toString() === hangoutId);
-
-    if (hangout) {
-      downloadCalInvite(hangout);
-    }
-  }
-});
