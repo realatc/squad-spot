@@ -57,10 +57,30 @@
 <script>
   // Initialize map centered around a default location (Atlanta, GA)
   let map = L.map('map').setView([33.7490, -84.3880], 12);  // Atlanta, GA
+  // Define custom icons near the top of your script, after initializing the map. Red for user, blue for places
+  const userIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+  });
+
+  const placeIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+  });
   let markers = []; // Array to store map markers
   let userMarker = null; // To store the user's current location marker
   let squadMembers = []; // To store squad members
   let selectedSquad = null; // The currently selected squad
+  let poiMarkers = [];   // Store markers for search results (e.g., restaurants)
+  let userMarkers = [];  // Store markers for squad members
 
   // Predefined squads and their members (with coordinates from various locations)
   const squads = [
@@ -118,28 +138,33 @@
     return { lat: latSum / locations.length, lng: lngSum / locations.length };
   }
 
-  // Function to update the squad members list on the UI
+  // Function replaced previous code to update the squad members list on the UI
   function updateSquadList(squad) {
     const squadListElement = document.getElementById('squadMembers');
-    squadListElement.innerHTML = ''; // Clear previous list
+  squadListElement.innerHTML = '';
 
-    squad.members.forEach(user => {
-      const listItem = document.createElement('li');
-      listItem.textContent = `${user.name} - Location: [${user.lat}, ${user.lng}]`;
-      squadListElement.appendChild(listItem);
-    });
+  // Calculate centroid for distance calculation
+  const centroid = calculateCentroid(squad.members);
+
+  squad.members.forEach(user => {
+    const distance = calculateDistance(user.lat, user.lng, centroid.lat, centroid.lng).toFixed(2);
+    const listItem = document.createElement('li');
+    listItem.textContent = `${user.name} - Location: [${user.lat.toFixed(4)}, ${user.lng.toFixed(4)}] - ${distance} km from center`;
+    squadListElement.appendChild(listItem);
+  });
   }
 
-  // Function to show all squad members' markers on the map
+  // Made some changes to the function to show all squad members' markers on the map
   function showSquadMembers(squad) {
-    markers.forEach(marker => map.removeLayer(marker)); // Clear previous markers
-    markers = [];
+    // Clear old user markers only
+  userMarkers.forEach(marker => map.removeLayer(marker));
+  userMarkers = [];
 
-    squad.members.forEach(user => {
-      const marker = L.marker([user.lat, user.lng]).addTo(map);
-      marker.bindPopup(`${user.name}'s Location`).openPopup();
-      markers.push(marker);
-    });
+  squad.members.forEach(user => {
+    const marker = L.marker([user.lat, user.lng], { icon: userIcon }).addTo(map);
+    marker.bindPopup(`${user.name}'s Location`);
+    userMarkers.push(marker);
+  });
   }
 
   // Function to populate the dropdown with squad names
@@ -169,8 +194,13 @@
       navigator.geolocation.getCurrentPosition(position => {
         const userLoc = { lat: position.coords.latitude, lng: position.coords.longitude, name: 'Real User' };
 
-        selectedSquad.members.push(userLoc); // Add the real user to the squad when testing code
-        userLocations.push(userLoc); // Store the real user's location
+        const existingUserIndex = selectedSquad.members.findIndex(m => m.name === 'Real User');
+    if (existingUserIndex !== -1) {
+    selectedSquad.members[existingUserIndex] = userLoc; // overwrite existing
+    } else {
+    selectedSquad.members.push(userLoc); // add new if not found
+    } // Add the real user to the squad when testing code
+        userLocations = selectedSquad.members.map(m => ({ lat: m.lat, lng: m.lng })); // Made change for store the real user's location
 
         document.getElementById('squadMessage').textContent = `You joined ${selectedSquad.name} squad! Location shared.`;
 
@@ -181,6 +211,36 @@
     } else {
       alert('Geolocation is not supported by your browser.');
     }
+
+
+    // Added start periodic location updates for every 15 seconds
+    setInterval(() => {
+  if (navigator.geolocation && selectedSquad) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const updatedLoc = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        name: 'Real User'
+      };
+
+      const index = selectedSquad.members.findIndex(m => m.name === 'Real User');
+      if (index !== -1) {
+        selectedSquad.members[index] = updatedLoc;
+      } else {
+        selectedSquad.members.push(updatedLoc);
+      }
+
+      //  Rebuild userLocations array from squad data
+      userLocations = selectedSquad.members.map(m => ({
+        lat: m.lat,
+        lng: m.lng
+      }));
+
+      updateSquadList(selectedSquad);
+      showSquadMembers(selectedSquad);
+    });
+  }
+}, 15000); // Every 15 seconds
   });
 
   // Function to handle the activity search input
@@ -237,9 +297,9 @@
       const centroid = data.centroid;
       map.setView([centroid.lat, centroid.lng], 13);
 
-      // Clear previous markers except userMarker
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
+      // Made changes to clear previous markers except userMarker
+      poiMarkers.forEach(marker => map.removeLayer(marker));
+      poiMarkers = [];
 
       // Ensure user's location marker is still visible
       if (userMarker) {
@@ -256,7 +316,7 @@
         const lat = place.position.lat;
         const lon = place.position.lon;
 
-        const marker = L.marker([lat, lon]).addTo(map);
+        const marker = L.marker([lat, lon], { icon: placeIcon }).addTo(map);
 
         // Directions links to Google Maps and Apple Maps
         const googleMapsLink = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
@@ -270,7 +330,7 @@
           <a href="${appleMapsLink}" target="_blank">Get Directions (Apple Maps)</a>
         `).openPopup();
 
-        markers.push(marker);
+        poiMarkers.push(marker);
       });
     } catch (error) {
       alert('Error during search: ' + error.message);
@@ -282,6 +342,20 @@
     const query = document.getElementById('query').value;
     searchPlaces(query, userLocations);  // Call the new searchPlaces function
   });
+
+  // calculate the distance between two geographical points (in kilometers)
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const toRad = angle => angle * (Math.PI / 180);
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return (R * c) / 1000; // kilometers
+  }
 
   // Populate squad dropdown on page load
   window.onload = () => {
