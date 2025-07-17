@@ -240,10 +240,11 @@ body {
 /* Sign in Page */
 #signin-page {
     display: flex;
-    place-items: center;
-    padding: 1rem;
-    padding-top: 250px;
-     align-items: flex-start;
+    justify-content: Center;
+    align-items: center;
+    min-height: calc(100vh - 60px - 80px);
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .signin-container {
