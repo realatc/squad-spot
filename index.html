@@ -33,11 +33,11 @@
                     </svg>
                     Settings
                 </div>
-                <div class="profile-item">
+                <div class="profile-item" id="logoutBtn"> <!-- once profile is fully functioning add id="logoutBtn" here-->
                     <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17,7l-1.41,1.41L18.17,11H8v2h10.17l-2.58,2.58L17,17l5-5L17,7z M4,5h8V3H4C2.9,3,2,3.9,2,5v14c0,1.1,0.9,2,2,2h8v-2H4V5z"/>
                     </svg>
-                    Logout
+                   Logout
                 </div>
                 <div class="profile-item" id="resetDemoDataItem">
                     <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -48,10 +48,10 @@
             </div>
         </div>
     </header>
-        
+
     <!-- Main Content -->    
     <main class="main-content">
-        <!--Sign-in Page-->
+       <!--Sign-in Page-->
         <section id="signin-page" class="page active">
             <div class="signin-container">
                 <h2 class="header-title">Squad Spot</h2>
@@ -141,6 +141,12 @@
             </div>
         </section>
 
+       <!-- Contact will appear if Contact Picker works-->
+        <button id="createSquadFromContactsBtn" class="btn btn-primary" style="display: none; margin-top: 20px;">
+            Create Squad with Selected Contacts
+        </button>
+        <div id="selectedContactsDisplay"></div>
+
         <!-- Discover Page -->
         <section id="discover-page" class="page">
             <div class="discover-container">
@@ -179,9 +185,9 @@
             </div>
         </section>
 
-        <!-- Log Out Button -->
+        <!--CONATACT BUTTON ONCE PAGE IS SET UP-->
         <div class="form__text">
-            <button type="button" id="logoutBtn" class="btn btn-primary">Log Out</button>
+            <button type="button" id="pickContactBtn" class="btn btn-primary">Contacts</button>
         </div>
     </section>
     </main>
@@ -241,8 +247,8 @@
     <script src="js/modules/navigation.js"></script>
     <script src="js/modules/data.js"></script>
     <script src="js/modules/ui.js"></script>
-    <script src="testing.html"></script>
     <script src="js/main.js"></script>
     <script src="js/signin-login.js" type="module"></script>
+    <script src="js/contact-picker.js"></script> </body>
 </body>
 </html> 

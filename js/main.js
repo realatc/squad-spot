@@ -594,15 +594,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    SquadSpot.init();
-
   // Registering Service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('js/service-worker.js')
-    .then((reg) => console.log("service Worker registered:", reg))
-    .catch((err) => console.log("service Worker registeration failed:", err));
-}
-// Switch btw Login and Sign up links 
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('js/service-worker.js')
+        .then((reg) => console.log("service Worker registered:", reg))
+        .catch((err) => console.log("service Worker registeration failed:", err));
+    }
+    // Switch btw Login and Sign up links 
     const loginForm = document.querySelector("#loginForm");
     const createAccountForm = document.querySelector("#createAccountForm");   
     document.querySelector("#linkCreateAccount").addEventListener("click", e => {

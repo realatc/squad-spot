@@ -239,11 +239,19 @@ body {
 
 /* Sign in Page */
 #signin-page {
-    display: flex;
-    place-items: center;
-    padding: 1rem;
-    padding-top: 250px;
-     align-items: flex-start;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;    
+    min-height: calc(100vh - 60px); /*-80px*/    
+    margin: auto;
+    padding-top: 250;
+    box-sizing: border-box;
+}
+
+.pickContactBtn {
+   position: static;
+   top: 40px;
+   left: 40px;
 }
 
 .signin-container {
