@@ -1,0 +1,40 @@
+# .gitignore
+# featureList.md
+# instructions.md
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# IDE files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Temporary folders
+tmp/
+temp/
