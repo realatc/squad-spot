@@ -98,26 +98,6 @@ Squad Spot is a web-based social application designed to help friends and groups
 2. Create an account and get a free API key
 3. Add the key to your `.env` file
 
-## Project Structure
-
-```
-squad-spot/
-├── css/                    # Stylesheets
-│   ├── base/              # Base styles and variables
-│   ├── components/        # Component-specific styles
-│   ├── layout/           # Layout styles
-│   └── pages/            # Page-specific styles
-├── js/                    # JavaScript files
-│   ├── backend.js        # Node.js backend server
-│   ├── main.js           # Main application logic
-│   └── modules/          # Modular JavaScript components
-├── index.html            # Main application entry point
-├── geolocation.html      # Location-based features
-├── package.json          # Node.js dependencies
-├── env.template          # Environment variables template
-└── README.md            # This file
-```
-
 ## Technology Stack
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES6+)
@@ -140,42 +120,12 @@ Squad Spot works best in modern browsers that support:
 - Some features may not work in older browsers
 - Geolocation requires user permission
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## Development
 
 ### Running in Development Mode
 ```bash
 npm start
 ```
-
-### Building for Production
-The application is currently a static web app that can be deployed to any web server or CDN.
-
-### Testing
-Open the application in your browser and test the following features:
-- Squad creation and management
-- Hangout planning
-- Venue search and voting
-- Contact import and management
-- Geolocation features
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support and questions:
-- Check the project issues on GitHub
-- Review the code comments for implementation details
-- Ensure all API keys are properly configured
 
 ---
 
