@@ -22,20 +22,20 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
   const header = document.querySelector("header");
   const nav = document.querySelector(".bottom-nav");
   const floatingBtn = document.getElementById("floatingNewSquadBtn");
-  //const logoutBtn = document.getElementById("logoutBtn");
 
   // Show/hide UI based on auth state
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // User signed in: show app, hide sign-in form
       signinPage.style.display = "none";
-      appSection.style.display = "block";
+      appSection.style.display = "flex"; //block
       header.style.display = "flex";
       nav.style.display = "flex";
       floatingBtn.style.display = "flex";
+      requestNotificationPermission();
     } else {
       // No user: show sign-in form, hide app
-      signinPage.style.display = "block";
+      signinPage.style.display = "flex";
       appSection.style.display = "none";
       header.style.display = "none";
       nav.style.display = "none";
@@ -44,16 +44,14 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
   });
  
   // Sign in
-  document.addEventListener("DOMContentLoaded", () => {
-
-    // Log out
+  //Log out
     const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
+    if (logoutBtn) { // This check is crucial and good practice!
       logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
         window.location.href = "index.html";
-      });
-    } 
+  });
+}
 
     // Sign in through Email & Password
     const loginEmailPassword = document.getElementById("loginbtn");
@@ -68,7 +66,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword(auth, email, password)
         .then((result) => {
           const user = result.user;
-          console.log("Signed in with email: ", user);
+          localStorage.setItem('userId', user.uid);
           window.location.href = "index.html";// change this to Squad Spot main page
         })
         .catch((error) => {
@@ -76,19 +74,20 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
           alert("Login failed: " + error.message);
         });
       });
+    }
 
     // Google signin
     const googleLogin = document.getElementById("googleSignInBtn");
     
-    if (googleLogin){
+    if (googleLogin) {
       googleLogin.addEventListener("click", () => {
         signInWithPopup(auth, provider)
         .then((result) => {
           const credential1 = GoogleAuthProvider.credentialFromResult(result);
           const user = result.user;
-          console.log(user);
+          localStorage.setItem('user1', user.uid);
           window.location.href = "index.html"; // change this to Squad Spot main page
-      })
+        })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
@@ -97,7 +96,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
     }
 
     // Create Account
-    const createAccount = document.getElementById("createAccountBtn");
+    const createAccount = document.getElementById("createAccountBtn"); //linkCreateAccount
     const signupEmail = document.getElementById("signupEmail");
     const signupPassword = document.getElementById("signupPassword");
     const signupConfirmPassword = document.getElementById("signupConfirmPassword");
@@ -118,7 +117,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
         createUserWithEmailAndPassword(auth, email, password)
           .then((result) => {
             const user = result.user;
-            console.log("Account created: ", user);
+            localStorage.setItem('user1', user.uid);
             alert("Account created successfully!");
             window.location.href = "index.html"; // change this to Squad Spot main page
           })
@@ -128,6 +127,4 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
           });
       });
     }
-  }}
-); 
 

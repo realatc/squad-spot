@@ -6,7 +6,15 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     console.log('Service Worker activating...');
 });
-/*
+
 self.addEventListener("fetch", (event) => {
-// Requests go through normally
-});*/
+    event.respondWith(fetch(event.request));
+});
+
+self.addEventListener('notificationclick', event => {
+    const url = event.notification.data?.url;
+    event.notification.close();
+    if (url) {
+        event.waitUntil(clients.openWindow(url));
+    }
+});
