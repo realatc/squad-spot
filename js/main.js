@@ -1,3 +1,152 @@
+// Data Management Functions
+const DataManager = {
+    getSquads() {
+        return JSON.parse(localStorage.getItem('squads') || '[]');
+    },
+    
+    getHangouts() {
+        return JSON.parse(localStorage.getItem('hangouts') || '[]');
+    },
+    
+    getVenues(filter = 'all') {
+        const venues = JSON.parse(localStorage.getItem('venues') || '[]');
+        if (filter === 'all') return venues;
+        return venues.filter(venue => venue.type === filter);
+    },
+    
+    getActivity() {
+        return JSON.parse(localStorage.getItem('activities') || '[]');
+    },
+    
+    addSquad(squad) {
+        const squads = this.getSquads();
+        squad.id = Date.now().toString();
+        squads.push(squad);
+        localStorage.setItem('squads', JSON.stringify(squads));
+        return squad;
+    },
+    
+    addHangout(hangout) {
+        const hangouts = this.getHangouts();
+        hangout.id = Date.now().toString();
+        hangouts.push(hangout);
+        localStorage.setItem('hangouts', JSON.stringify(hangouts));
+        return hangout;
+    },
+    
+    updateHangoutVote(hangoutId, userId, venueId) {
+        const hangouts = this.getHangouts();
+        const hangout = hangouts.find(h => h.id === hangoutId);
+        if (hangout) {
+            if (!hangout.votes) hangout.votes = {};
+            hangout.votes[userId] = venueId;
+            localStorage.setItem('hangouts', JSON.stringify(hangouts));
+            return true;
+        }
+        return false;
+    },
+    
+    addActivity(activity) {
+        const activities = this.getActivity();
+        activity.id = Date.now().toString();
+        activity.timestamp = new Date().toISOString();
+        activities.unshift(activity);
+        localStorage.setItem('activities', JSON.stringify(activities));
+        return activity;
+    },
+    
+    searchVenues(query) {
+        const venues = this.getVenues();
+        return venues.filter(venue => 
+            venue.name.toLowerCase().includes(query.toLowerCase()) ||
+            venue.description.toLowerCase().includes(query.toLowerCase())
+        );
+    },
+    
+    removeSquad(squadId) {
+        const squads = this.getSquads();
+        const filteredSquads = squads.filter(s => s.id !== squadId);
+        localStorage.setItem('squads', JSON.stringify(filteredSquads));
+    },
+    
+    formatDate(timestamp) {
+        return new Date(timestamp).toLocaleDateString();
+    }
+};
+
+// UI Management Functions
+const UI = {
+    showModal(title, content) {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalContent) modalContent.innerHTML = content;
+        if (modal) modal.style.display = 'flex';
+    },
+    
+    hideModal() {
+        const modal = document.getElementById('modal');
+        if (modal) modal.style.display = 'none';
+    },
+    
+    createForm(fields, formId) {
+        const form = document.createElement('form');
+        form.id = formId;
+        
+        fields.forEach(field => {
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            if (field.required) label.innerHTML += ' *';
+            
+            let input;
+            if (field.type === 'textarea') {
+                input = document.createElement('textarea');
+                input.rows = 3;
+            } else if (field.type === 'select') {
+                input = document.createElement('select');
+                field.options.forEach(option => {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = option.value;
+                    optionEl.textContent = option.label;
+                    input.appendChild(optionEl);
+                });
+            } else {
+                input = document.createElement('input');
+                input.type = field.type;
+            }
+            
+            input.name = field.name;
+            input.className = 'form-input';
+            if (field.required) input.required = true;
+            if (field.value) input.value = field.value;
+            
+            formGroup.appendChild(label);
+            formGroup.appendChild(input);
+            form.appendChild(formGroup);
+        });
+        
+        const actions = document.createElement('div');
+        actions.className = 'form-actions';
+        actions.innerHTML = `
+            <button type="button" class="btn btn-secondary" onclick="UI.hideModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        `;
+        form.appendChild(actions);
+        
+        return form;
+    },
+    
+    showNotification(message, type = 'info') {
+        // Simple notification - you can enhance this later
+        alert(`${type.toUpperCase()}: ${message}`);
+    }
+};
+
 // Main Application File
 const SquadSpot = {
     init() {
