@@ -115,3 +115,29 @@ This starts the server with auto-restart on file changes.
 - **TomTom API**: Primary venue search and location services
 - **Google Maps API**: Geocoding and Places search
 - **Dual API Strategy**: Combines both services for comprehensive venue data
+
+## Troubleshooting
+
+### General
+- App Not Loading or Blank Screen
+1. Ensure you are running the backend server (npm start) before opening the app in the browser.
+2. Make sure JavaScript is enabled in your browser.
+3. Open the browser console (DevTools > Console) to check for errors and follow the messages. 
+
+- Changes Not Reflecting During Development
+1. Make sure you are running the app with npm run dev for hot reload support.
+2. Try stopping and restarting the server.
+3. Clear your browser cache and refresh the page.
+
+### Authentication Issues
+- Login Fails with Correct Credentials
+1. Ensure the backend server is running and reachable.
+2. Check the console for any CORS errors or server-side authentication errors.
+3. Try logging in using Google OAuth if email/password isn’t working.
+
+### Geolocation & Maps
+- Location Not Detected
+1. Make sure your browser supports geolocation and location permissions are granted.
+2. Reload the page and allow location access when prompted.
+3. On desktop browsers, ensure you're not blocking location sharing.
+
