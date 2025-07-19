@@ -33,11 +33,11 @@
                     </svg>
                     Settings
                 </div>
-                <div class="profile-item">
+                <div class="profile-item" id="logoutBtn"> <!-- once profile is fully functioning add id="logoutBtn" here-->
                     <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17,7l-1.41,1.41L18.17,11H8v2h10.17l-2.58,2.58L17,17l5-5L17,7z M4,5h8V3H4C2.9,3,2,3.9,2,5v14c0,1.1,0.9,2,2,2h8v-2H4V5z"/>
                     </svg>
-                    Logout
+                   Logout
                 </div>
                 <div class="profile-item" id="resetDemoDataItem">
                     <svg class="menu-icon" fill="currentColor" viewBox="0 0 24 24">
@@ -49,8 +49,68 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content -->    
     <main class="main-content">
+       <!--Sign-in Page-->
+        <section id="signin-page" class="page active">
+            <div class="signin-container">
+                <h2 class="header-title">Squad Spot</h2>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="signin-form">
+                    <h3>Login</h3>
+                    <div class="error_message"></div>
+
+                    <div class="form__input-group">
+                        <input type="text" id="loginUsername" class="form__input" placeholder="Email" required>
+                        <div class="error_message"></div>
+                    </div>
+
+                    <div class="form__input-group">
+                        <input type="password" id="loginPassword" class="form__input" placeholder="Password" required>
+                        <div class="error_message"></div>
+                    </div>
+
+                    <button type="button" id="loginbtn" class="btn btn-primary">Sign In</button>
+                    <button type="button" id="googleSignInBtn" class="btn btn-primary">Login with Google</button>
+
+                    <p class="form__text">
+                        Don't have an account? 
+                        <a class="form__link" href="#" id="linkCreateAccount">Create account</a>
+                    </p>
+                </form>
+            
+                <!-- Create Account Form -->
+                <form id="createAccountForm" class="signin-form form--hidden">
+                    <h3>Create Account</h3>
+                    <div class="error_message"></div>
+
+                    <div class="form__input-group">
+                        <input type="email" id="signupEmail" class="form__input" placeholder="Email Address" required>
+                        <div class="error_message"></div>
+                    </div>
+
+                    <div class="form__input-group">
+                        <input type="password" id="signupPassword" class="form__input" placeholder="Password" required>
+                        <div class="error_message"></div>
+                    </div>
+
+                    <div class="form__input-group">
+                        <input type="password" id="signupConfirmPassword" class="form__input" placeholder="Confirm Password" required>
+                        <div class="error_message"></div>
+                    </div>
+
+                    <button type="button" id="createAccountBtn" class="btn btn-primary">Create Account</button>
+
+                    <p class="form__text">
+                        Already have an account?
+                        <a class="form__link" href="#" id="linkLogin">Sign in</a>
+                    </p> 
+                </form>
+            </div>
+        </section> 
+
+    <section id="app-wrapper" style="display: none;">
         <!-- Squads Page -->
         <section id="squads-page" class="page active">
             <div class="squads-container">
@@ -62,7 +122,7 @@
                 </div>
             </div>
         </section>
-
+    
         <!-- Hangouts Page -->
         <section id="hangouts-page" class="page">
             <div class="hangouts-container">
@@ -80,6 +140,12 @@
                 </div>
             </div>
         </section>
+
+       <!-- Contact will appear if Contact Picker works-->
+        <button id="createSquadFromContactsBtn" class="btn btn-primary" style="display: none; margin-top: 20px;">
+            Create Squad with Selected Contacts
+        </button>
+        <div id="selectedContactsDisplay"></div>
 
         <!-- Discover Page -->
         <section id="discover-page" class="page">
@@ -118,6 +184,12 @@
                 </div>
             </div>
         </section>
+
+        <!--CONATACT BUTTON ONCE PAGE IS SET UP-->
+        <div class="form__text">
+            <button type="button" id="pickContactBtn" class="btn btn-primary">Contacts</button>
+        </div>
+    </section>
     </main>
 
     <!-- Floating New Squad Button -->
@@ -173,8 +245,11 @@
     </div>
 
     <script src="js/modules/navigation.js"></script>
-    <script src="js/modules/data.js"></script>
-    <script src="js/modules/ui.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/modules/data-manager.js"></script>
+    <script src="js/modules/ui-manager.js"></script>
+    <script src="js/modules/notification-manager.js"></script>
+    <script src="js/modules/signin-login.js" type="module"></script>
+    <script src="js/modules/contact-picker.js"></script>
+    <script src="js/main.js"></script> </body>
 </body>
 </html> 

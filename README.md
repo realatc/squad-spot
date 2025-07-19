@@ -140,3 +140,4 @@ This starts the server with auto-restart on file changes.
 1. Make sure your browser supports geolocation and location permissions are granted.
 2. Reload the page and allow location access when prompted.
 3. On desktop browsers, ensure you're not blocking location sharing.
+

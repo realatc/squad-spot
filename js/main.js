@@ -1,9 +1,137 @@
+// Import modules (using script tags instead of ES6 imports)
+// DataManager, UI, and NotificationManager are loaded via separate script tags
+
+
+
 // Main Application File
 const SquadSpot = {
     init() {
+        this.initializeDemoData(); // Initialize demo data if needed
         this.initializeModules();
         this.bindGlobalEvents();
         this.loadInitialData();
+    },
+    
+    initializeDemoData() {
+        // Check if demo data already exists
+        const existingSquads = DataManager.getSquads();
+        const existingHangouts = DataManager.getHangouts();
+        
+        // Only initialize if no data exists (first time loading the app)
+        if (existingSquads.length === 0 && existingHangouts.length === 0) {
+            console.log('Initializing demo data...');
+            
+            // Demo Squad
+            const demoSquad = {
+                id: 'demo-squad-1',
+                name: 'Demo Squad',
+                members: [
+                    { id: 'user1', name: 'Alex' },
+                    { id: 'user2', name: 'Sarah' },
+                    { id: 'user3', name: 'Mike' }
+                ]
+            };
+            
+            // Demo Hangout with pre-existing votes
+            const demoHangout = {
+                id: 'demo-hangout-1',
+                title: 'Friday Night Dinner',
+                squadId: 'demo-squad-1',
+                date: '2024-01-26',
+                type: 'food',
+                status: 'voting',
+                venues: [
+                    { id: 'venue1', name: 'Pizza Palace', votes: 1 },
+                    { id: 'venue2', name: 'Burger Joint', votes: 1 },
+                    { id: 'venue3', name: 'Sushi Bar', votes: 0 }
+                ],
+                votes: {
+                    'user2': 'venue1', // Sarah voted for Pizza Palace
+                    'user3': 'venue2'  // Mike voted for Burger Joint
+                }
+                // Alex (user1) hasn't voted yet - this will be the demo vote
+            };
+            
+            // Demo Venues
+            const demoVenues = [
+                {
+                    id: 'venue1',
+                    name: 'Pizza Palace',
+                    description: 'Authentic Italian pizza with fresh ingredients',
+                    location: 'Downtown',
+                    rating: 4.5,
+                    price: '$$',
+                    type: 'food',
+                    image: 'https://via.placeholder.com/300x200?text=Pizza+Palace'
+                },
+                {
+                    id: 'venue2',
+                    name: 'Burger Joint',
+                    description: 'Gourmet burgers and craft beer selection',
+                    location: 'Midtown',
+                    rating: 4.2,
+                    price: '$$',
+                    type: 'food',
+                    image: 'https://via.placeholder.com/300x200?text=Burger+Joint'
+                },
+                {
+                    id: 'venue3',
+                    name: 'Sushi Bar',
+                    description: 'Fresh sushi and Japanese cuisine',
+                    location: 'Uptown',
+                    rating: 4.7,
+                    price: '$$$',
+                    type: 'food',
+                    image: 'https://via.placeholder.com/300x200?text=Sushi+Bar'
+                }
+            ];
+            
+            // Demo Activity Feed
+            const demoActivities = [
+                {
+                    id: 'activity1',
+                    type: 'squad_created',
+                    message: 'Demo Squad was created',
+                    squadId: 'demo-squad-1',
+                    timestamp: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+                },
+                {
+                    id: 'activity2',
+                    type: 'hangout_created',
+                    message: 'Friday Night Dinner was planned',
+                    squadId: 'demo-squad-1',
+                    timestamp: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+                },
+                {
+                    id: 'activity3',
+                    type: 'vote_cast',
+                    message: 'Sarah voted for Pizza Palace',
+                    squadId: 'demo-squad-1',
+                    timestamp: new Date(Date.now() - 1800000).toISOString() // 30 minutes ago
+                },
+                {
+                    id: 'activity4',
+                    type: 'vote_cast',
+                    message: 'Mike voted for Burger Joint',
+                    squadId: 'demo-squad-1',
+                    timestamp: new Date(Date.now() - 900000).toISOString() // 15 minutes ago
+                }
+            ];
+            
+            // Store demo data
+            localStorage.setItem('squads', JSON.stringify([demoSquad]));
+            localStorage.setItem('hangouts', JSON.stringify([demoHangout]));
+            localStorage.setItem('venues', JSON.stringify(demoVenues));
+            localStorage.setItem('activities', JSON.stringify(demoActivities));
+            
+            console.log('Demo data initialized successfully!');
+            console.log('🎯 Demo Instructions:');
+            console.log('1. Navigate to Hangouts page');
+            console.log('2. Click on "Friday Night Dinner"');
+            console.log('3. You should see "Members who haven\'t voted yet: Alex"');
+            console.log('4. Click "Vote" and select a venue');
+            console.log('5. Watch the notification trigger when all votes are in!');
+        }
     },
     
     initializeModules() {
@@ -243,7 +371,9 @@ const SquadSpot = {
                     'squad_created': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.7 2.26A6.49 6.49 0 0 0 10.88 8H8.5c-.8 0-1.54.37-2.01 1L4.96 14.37A1.5 1.5 0 0 0 6.5 16H9v6h2v-6h1v6h2v-6h4z"/></svg>',
                     'hangout_created': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
                     'vote_cast': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-                    'squad_joined': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.7 2.26A6.49 6.49 0 0 0 10.88 8H8.5c-.8 0-1.54.37-2.01 1L4.96 14.37A1.5 1.5 0 0 0 6.5 16H9v6h2v-6h1v6h2v-6h4z"/></svg>'
+                    'squad_joined': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.7 2.26A6.49 6.49 0 0 0 10.88 8H8.5c-.8 0-1.54.37-2.01 1L4.96 14.37A1.5 1.5 0 0 0 6.5 16H9v6h2v-6h1v6h2v-6h4z"/></svg>',
+                    'reminder_sent': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>',
+                    'vote_complete': '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
                 };
                 return icons[type] || '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
             }
@@ -397,6 +527,11 @@ const SquadSpot = {
         const squad = DataManager.getSquads().find(s => s.id === hangout.squadId);
         
         if (hangout && squad) {
+            // Get members who haven't voted yet
+            const membersWithoutVotes = squad.members.filter(member => {
+                return !hangout.votes || !hangout.votes[member.id];
+            });
+            
             const content = `
                 <div class="hangout-details">
                     <h3>${hangout.title}</h3>
@@ -407,11 +542,29 @@ const SquadSpot = {
                     
                     <h4>Venues:</h4>
                     ${hangout.venues.map(venue => `
-                        <div class="venue-item">
+                        <div class="venue-item ${hangout.selectedVenue === venue.id ? 'selected-venue' : ''}">
                             <span>${venue.name}</span>
                             <span class="venue-votes">${venue.votes} votes</span>
+                            ${hangout.selectedVenue === venue.id ? '<span class="selected-badge">✓ Selected</span>' : ''}
                         </div>
                     `).join('')}
+                    
+                    ${membersWithoutVotes.length > 0 ? `
+                        <div class="reminder-section">
+                            <h4>Members who haven't voted yet:</h4>
+                            <div class="members-without-votes">
+                                ${membersWithoutVotes.map(member => `
+                                    <div class="member-item">
+                                        <span class="member-avatar">${member.name.charAt(0)}</span>
+                                        <span>${member.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="btn btn-warning" onclick="SquadSpot.sendReminder('${hangoutId}')">
+                                Send Reminder Notification
+                            </button>
+                        </div>
+                    ` : '<p><em>All members have voted!</em></p>'}
                     
                     <div class="hangout-actions">
                         <button class="btn btn-primary" onclick="SquadSpot.voteHangout('${hangoutId}')">Vote</button>
@@ -472,7 +625,18 @@ const SquadSpot = {
                 message: `Alex voted for ${venue.name}`,
                 squadId: hangout.squadId
             });
+            
+            // Check if all members have voted
+            this.checkVoteCompletion(hangoutId);
         }
+    },
+    
+    sendReminder(hangoutId) {
+        NotificationManager.sendReminder(hangoutId);
+    },
+    
+    checkVoteCompletion(hangoutId) {
+        NotificationManager.checkVoteCompletion(hangoutId);
     },
     
     viewVenue(venueId) {
@@ -591,6 +755,29 @@ document.addEventListener('DOMContentLoaded', () => {
             SquadSpot.showCreateSquadModal();
         });
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Registering Service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('js/service-worker.js')
+        .then((reg) => console.log("service Worker registered:", reg))
+        .catch((err) => console.log("service Worker registeration failed:", err));
+    }
+    // Switch btw Login and Sign up links 
+    const loginForm = document.querySelector("#loginForm");
+    const createAccountForm = document.querySelector("#createAccountForm");   
+    document.querySelector("#linkCreateAccount").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.add("form--hidden");
+        createAccountForm.classList.remove("form--hidden");
+    });
+
+    document.querySelector("#linkLogin").addEventListener("click", e => {
+        e.preventDefault();
+        loginForm.classList.remove("form--hidden");
+        createAccountForm.classList.add("form--hidden");
+    });
 });
 
 SquadSpot.showSquadActionsMenu = function(squadId, anchorBtn) {
