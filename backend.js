@@ -1,11 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-const TOMTOM_API_KEY = ''; // insert API key from TomTom when testing
+const TOMTOM_API_KEY = process.env.TOMTOM_API_KEY;
 
 app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // Parse incoming JSON requests
