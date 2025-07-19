@@ -15,6 +15,5 @@
     "dotenv": "^16.3.1"
   },
   "keywords": ["squad", "location", "restaurant", "geolocation"],
-  "author": "Squad Spot Team",
-  "license": "MIT"
+  "author": "Squad Spot Team"
 } 
